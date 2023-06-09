@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-RSpec.describe "/tasks", type: :request do
+RSpec.describe TasksController, type: :controller do
   before(:all) do
     @admin = create(:user, :admin)
     @editor = create(:user, :editor)
@@ -10,11 +10,12 @@ RSpec.describe "/tasks", type: :request do
   describe 'GET /index' do
     before do
       create_list(:task, 30)
+      request.headers.merge!(@normal.create_new_auth_token)
     end
 
     context 'without order or pagination' do
       it 'lists all tasks' do
-        get tasks_url, headers: @normal.create_new_auth_token
+        get :index
         records_count = JSON.parse(response.body).size
         expect(response).to be_successful
         expect(records_count).to eq(30)
@@ -29,7 +30,7 @@ RSpec.describe "/tasks", type: :request do
           page: 2,
           per_page: 25
         }
-        get tasks_url, params: params, headers: @normal.create_new_auth_token
+        get :index, params: params
         records_count = JSON.parse(response.body).size
         expect(response).to have_http_status(:success)
         expect(records_count).to eq(5)
@@ -40,9 +41,13 @@ RSpec.describe "/tasks", type: :request do
   describe "GET /show" do
     let(:task) { create(:task) }
 
+    before do
+      request.headers.merge!(@normal.create_new_auth_token)
+    end
+
     context 'with existing resource' do
       it 'render the existing task' do
-        get task_url(task), headers: @normal.create_new_auth_token
+        get :show, params: { id: task.id }
         expect(response).to be_successful
         json_response = JSON.parse(response.body)
         expect(json_response['name']).not_to be_nil
@@ -54,7 +59,7 @@ RSpec.describe "/tasks", type: :request do
     context 'with invalid resource' do
       it 'raise record not found exception' do
         expect do
-          get task_url(task.id + 1), headers: @normal.create_new_auth_token
+          get :show, params: { id: task.id + 1 }
         end.to raise_error(ActiveRecord::RecordNotFound)
       end
     end
@@ -62,6 +67,10 @@ RSpec.describe "/tasks", type: :request do
 
   describe 'POST /create' do
     context 'with valid user' do 
+      before do
+        request.headers.merge!(@editor.create_new_auth_token)
+      end
+
       context 'with valid parameters' do
         it 'creates new a task' do
           params = {
@@ -71,7 +80,7 @@ RSpec.describe "/tasks", type: :request do
               status: :active
             }
           }
-          post tasks_url, params: params, headers: @editor.create_new_auth_token
+          post :create, params: params
 
           expect(response).to have_http_status(:created)
           expect(Task.count).to eq(1)
@@ -86,7 +95,7 @@ RSpec.describe "/tasks", type: :request do
               description: 'a' * 101,
             }
           }
-          post tasks_url, params: params, headers: @editor.create_new_auth_token
+          post :create, params: params
 
           expect(response).to have_http_status(:unprocessable_entity)
           expect(Task.count).to eq(0)
@@ -95,6 +104,9 @@ RSpec.describe "/tasks", type: :request do
     end
 
     context 'with invalid user' do
+      before do
+        request.headers.merge!(@normal.create_new_auth_token)
+      end
       it 'does not creates a new task' do
         params = {
           task: {
@@ -103,7 +115,7 @@ RSpec.describe "/tasks", type: :request do
             status: :active
           }
         }
-        post tasks_url, params: params, headers: @normal.create_new_auth_token, as: :json
+        post :create, params: params, as: :json
 
         expect(response).to have_http_status(:forbidden)
         expect(Task.count).to eq(0)
@@ -115,16 +127,21 @@ RSpec.describe "/tasks", type: :request do
     let(:task) { create(:task) }
     
     context 'with valid user' do 
+      before do
+        request.headers.merge!(@editor.create_new_auth_token)
+      end
+
       context 'with valid parameters' do
         it 'updates a task' do
           params = {
+            id: task.id,
             task: {
               name: 'New valid name',
               description: 'New valid description',
               status: :active
             }
           }
-          put task_url(task), params: params, headers: @editor.create_new_auth_token
+          put :update, params: params
 
           expect(response).to have_http_status(:ok)
           task.reload
@@ -136,12 +153,13 @@ RSpec.describe "/tasks", type: :request do
       context 'with invalid parameters' do
         it 'does not update a task' do
           params = {
+            id: task.id,
             task: {
               name: 'Invalid_name',
               description: 'Invalid_description',
             }
           }
-          put task_url(task), params: params, headers: @editor.create_new_auth_token
+          put :update, params: params
 
           expect(response).to have_http_status(:unprocessable_entity)
           task.reload
@@ -154,11 +172,12 @@ RSpec.describe "/tasks", type: :request do
         it 'does not update a task' do
           in_progress_task = create(:task, :in_progress)
           params = {
+            id: in_progress_task.id,
             task: {
               name: 'Another valid name',
             }
           }
-          put task_url(in_progress_task), params: params, headers: @editor.create_new_auth_token
+          put :update, params: params
           expect(response).to have_http_status(:unprocessable_entity)
           in_progress_task.reload
           expect(in_progress_task.name).not_to eq('Another valid name')
@@ -167,15 +186,20 @@ RSpec.describe "/tasks", type: :request do
     end
 
     context 'with invalid user' do
+      before do
+        request.headers.merge!(@normal.create_new_auth_token)
+      end
+
       it 'does not updates a task' do
         params = {
+          id: task.id,
           task: {
             name: 'Valid name',
             description: 'Valid description',
             status: :active
           }
         }
-        put task_url(task), params: params, headers: @normal.create_new_auth_token, as: :json
+        put :update, params: params, as: :json
 
         expect(response).to have_http_status(:forbidden)
         expect(task.name).not_to eq('Valid name')
@@ -185,10 +209,15 @@ RSpec.describe "/tasks", type: :request do
   end
 
   describe 'DELETE /destroy' do    
+    before do
+      request.headers.merge!(@admin.create_new_auth_token)
+    end
+
     context 'with valid user' do
       it 'destroys the requested task' do
         task = create(:task)
-        delete task_url(task), headers: @admin.create_new_auth_token
+        params = { id: task.id }
+        delete :destroy, params: params
 
         expect(response).to have_http_status(:no_content)
         expect(Task.count).to eq(0)
@@ -196,9 +225,14 @@ RSpec.describe "/tasks", type: :request do
     end
 
     context 'with invalid user' do
+      before do
+        request.headers.merge!(@normal.create_new_auth_token)
+      end
+
       it 'does not destroys the requested task' do
         task = create(:task)
-        delete task_url(task), headers: @normal.create_new_auth_token, as: :json
+        params = { id: task.id }
+        delete :destroy, params: params, as: :json
 
         expect(response).to have_http_status(:forbidden)
         expect(Task.count).to eq(1)

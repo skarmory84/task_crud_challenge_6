@@ -5,9 +5,11 @@ class TasksController < ApplicationController
 
   # GET /tasks
   def index
+    order_direction_hash = { asc: :asc, desc: :desc }
     order_by = params[:order_by] || :id
+    order_direction = order_direction_hash[params[:order_direction]] || :asc
     page = params[:page]&.to_i || 1
-    per_page = params[:per_page]&.to_i || 25
+    per_page = params[:per_page]&.to_i || Task.count
     
     @tasks = Task.limit(per_page).offset((page - 1) * per_page).order(order_by)
 

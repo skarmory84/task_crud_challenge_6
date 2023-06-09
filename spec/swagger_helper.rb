@@ -25,7 +25,7 @@ RSpec.configure do |config|
       components: {
         securitySchemes: {
           Bearer: {
-            description: 'the jwt for API auth',
+            description: 'The jwt for API auth',
             type: :apiKey,
             name: 'Authorization',
             in: :header

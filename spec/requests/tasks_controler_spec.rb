@@ -10,10 +10,10 @@ RSpec.describe 'Tasks API', type: :request do
       tags 'Tasks'
       consumes 'application/json'
       security [Bearer: {}]
-      parameter name: :order_direction, in: :query, enum: ['asc', 'desc']
-      parameter name: :order_by, in: :query, enum: ['id', 'name', 'description']
-      parameter name: :page, in: :query, type: :integer
-      parameter name: :per_page, in: :query, type: :integer
+      parameter name: :order_direction, in: :query, type: :string, nullable: true, enum: [nil, 'asc', 'desc'], description: 'Order by asc or desc'
+      parameter name: :order_by, in: :query, type: :string, nullable: true, enum: [nil, 'id', 'name', 'description'], description: 'Order by field, id, name or description'
+      parameter name: :page, in: :query, type: :integer, description: 'Page for pagination (started with 1)'
+      parameter name: :per_page, in: :query, type: :integer, description: 'Tasks per page'
 
       response '200', 'get list' do
         let(:'Authorization') { @user.create_new_auth_token['Authorization'] }

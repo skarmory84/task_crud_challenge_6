@@ -14,21 +14,33 @@ paths:
       parameters:
       - name: order_direction
         in: query
+        nullable: true
         enum:
+        -
         - asc
         - desc
+        description: Order by asc or desc
+        schema:
+          type: string
       - name: order_by
         in: query
+        nullable: true
         enum:
+        -
         - id
         - name
         - description
+        description: Order by field, id, name or description
+        schema:
+          type: string
       - name: page
         in: query
+        description: Page for pagination (started with 1)
         schema:
           type: integer
       - name: per_page
         in: query
+        description: Tasks per page
         schema:
           type: integer
       responses:
@@ -131,7 +143,7 @@ paths:
 components:
   securitySchemes:
     Bearer:
-      description: the jwt for API auth
+      description: The jwt for API auth
       type: apiKey
       name: Authorization
       in: header

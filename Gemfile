@@ -9,6 +9,22 @@ gem 'rails', '~> 6.1.7', '>= 6.1.7.3'
 gem 'sqlite3', '~> 1.4'
 # Use Puma as the app server
 gem 'puma', '~> 5.0'
+
+# Use of active model serializers
+gem 'active_model_serializers', '~> 0.10.0'
+
+# Use of devise gem for authentication
+gem 'devise'
+
+# Use of devise token for restful auth
+gem 'devise_token_auth'
+
+# Use of Can Can Can as authorization
+gem 'cancancan'
+
+# Debug
+gem 'pry', '~> 0.13.1'
+
 # Build JSON APIs with ease. Read more: https://github.com/rails/jbuilder
 # gem 'jbuilder', '~> 2.7'
 # Use Redis adapter to run Action Cable in production
@@ -23,11 +39,20 @@ gem 'puma', '~> 5.0'
 gem 'bootsnap', '>= 1.4.4', require: false
 
 # Use Rack CORS for handling Cross-Origin Resource Sharing (CORS), making cross-origin AJAX possible
-# gem 'rack-cors'
+gem 'rack-cors'
 
 group :development, :test do
   # Call 'byebug' anywhere in the code to stop execution and get a debugger console
   gem 'byebug', platforms: [:mri, :mingw, :x64_mingw]
+  
+  # Use of rspec
+  gem 'rspec-rails'
+
+  # Factory bot
+  gem 'factory_bot_rails'
+
+  # Faker
+  gem 'faker', '~> 3.2'
 end
 
 group :development do

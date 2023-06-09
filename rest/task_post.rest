@@ -1,0 +1,10 @@
+POST http://127.0.0.1:3000/tasks HTTP/1.1
+Accept: application/json
+Content-Type: application/json
+Authorization: Bearer eyJhY2Nlc3MtdG9rZW4iOiI5ekhRLW9kWmI0ZDE1dUMyT1RfV2xRIiwidG9rZW4tdHlwZSI6IkJlYXJlciIsImNsaWVudCI6InRGVU03d09LSnAyM21OZ2RITmhuYkEiLCJleHBpcnkiOiIxNjg3NDc3MjA4IiwidWlkIjoic2thcm1vcnlzdGVlbEBnbWFpbC5jb20ifQ==
+
+{
+  "name": "Test from HTTP Request",
+  "description": "Small desc",
+  "status": "active"
+}

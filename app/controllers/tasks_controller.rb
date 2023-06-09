@@ -13,12 +13,12 @@ class TasksController < ApplicationController
     
     @tasks = Task.limit(per_page).offset((page - 1) * per_page).order(order_by)
 
-    render json: @tasks
+    render json: @tasks, adapter: :json_api, include: [params[:include]]
   end
 
   # GET /tasks/1
   def show
-    render json: @task
+    render json: @task, adapter: :json_api, include: [params[:include]]
   end
 
   # POST /tasks
@@ -26,7 +26,7 @@ class TasksController < ApplicationController
     @task = current_user.tasks.new(task_params)
 
     if @task.save
-      render json: @task, status: :created, location: @task
+      render json: @task, status: :created, location: @task, adapter: :json_api, include: [params[:include]]
     else
       render json: @task.errors, status: :unprocessable_entity
     end
@@ -35,7 +35,7 @@ class TasksController < ApplicationController
   # PATCH/PUT /tasks/1
   def update
     if @task.update(task_params)
-      render json: @task
+      render json: @task, adapter: :json_api, include: [params[:include]]
     else
       render json: @task.errors, status: :unprocessable_entity
     end

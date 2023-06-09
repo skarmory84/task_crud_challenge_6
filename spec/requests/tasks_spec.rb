@@ -15,7 +15,7 @@ RSpec.describe "/tasks", type: :request do
     context 'without order or pagination' do
       it 'lists all tasks' do
         get tasks_url, headers: @normal.create_new_auth_token
-        records_count = JSON.parse(response.body).size
+        records_count = JSON.parse(response.body)['data'].size
         expect(response).to be_successful
         expect(records_count).to eq(30)
       end
@@ -30,7 +30,7 @@ RSpec.describe "/tasks", type: :request do
           per_page: 25
         }
         get tasks_url, params: params, headers: @normal.create_new_auth_token
-        records_count = JSON.parse(response.body).size
+        records_count = JSON.parse(response.body)['data'].size
         expect(response).to have_http_status(:success)
         expect(records_count).to eq(5)
       end
@@ -44,7 +44,7 @@ RSpec.describe "/tasks", type: :request do
       it 'render the existing task' do
         get task_url(task), headers: @normal.create_new_auth_token
         expect(response).to be_successful
-        json_response = JSON.parse(response.body)
+        json_response = JSON.parse(response.body)['data']['attributes']
         expect(json_response['name']).not_to be_nil
         expect(json_response['description']).not_to be_nil
         expect(json_response['status']).not_to be_nil

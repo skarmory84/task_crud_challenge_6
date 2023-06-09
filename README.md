@@ -35,8 +35,8 @@ Finally, start the server
 ```sh
 rails s
 ```
-
-## Authentication
+## Usage
+### Authentication
 
 You can use default devise token methods to authenticate. Default auth path is `{{host}}`/auth
 
@@ -54,7 +54,34 @@ Then, include the Authorization: Bearer in each request.
 
 Devise token usage at https://devise-token-auth.gitbook.io/devise-token-auth/usage
 
+### CRUD Operations
 
+Crud operations available are
+
+* GET /tasks
+* GET /tasks/{id}
+* POST /tasks
+* PUT /tasks/{id}
+* DELETE /tasks/{id}
+
+GET /task params are
+
+* order_by: an atribute to order. Posible values are id, name or description
+* order_direction: order asc or desc
+* page: Current page of pagination, starting by 1
+* per_page: Max tasks per page
+
+All of them are optional. By default, it is order asc, all tasks in one page.
+
+POST and PUT params are
+
+```sh
+{
+  "name": "The name",
+  "description": "An optional field",
+  "status": "active" #other values are inactive, in_progress
+}
+```
 ## Users
 
 An user has the following fields
@@ -72,6 +99,11 @@ A task has the following fields
 * Description: Description of the object
 * Status: Current status of the object
 
+Also, you can get the user related to the task by adding to the request
+```sh
+include=user
+```
+
 ## Validations and restrictions
 
 * A normal user can read tasks
@@ -80,3 +112,12 @@ A task has the following fields
 * Name is required and must be only number, letters and spaces.
 * Description is optional, but cannot be greater than 100 characters
 * The name of a task in progress can't be updated
+
+## Test and documentation
+A swagger documentation is included at /api-docs. You can interact with the endpoints from 127.0.0.1
+
+Also, the code is tested with rspec, test files are
+
+* spec/models/task_spec.rb
+* spec/routing/tasks_routing_spec.rb 
+* spec/requests/tasks_spec.rb

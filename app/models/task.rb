@@ -3,6 +3,8 @@ class Task < ApplicationRecord
   validates :description, length: { maximum: 100 }
   validate :name_cannot_be_updated_if_in_progress, on: :update
 
+  belongs_to :user, optional: true
+
   enum status: [:active, :in_progress, :inactive]
   
   private

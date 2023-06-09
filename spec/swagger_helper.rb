@@ -22,12 +22,22 @@ RSpec.configure do |config|
         version: 'v1'
       },
       paths: {},
+      components: {
+        securitySchemes: {
+          Bearer: {
+            description: 'the jwt for API auth',
+            type: :apiKey,
+            name: 'Authorization',
+            in: :header
+          }
+        }
+      },
       servers: [
         {
-          url: 'https://{defaultHost}',
+          url: 'http://{defaultHost}',
           variables: {
             defaultHost: {
-              default: 'www.example.com'
+              default: '127.0.0.1:3000'
             }
           }
         }

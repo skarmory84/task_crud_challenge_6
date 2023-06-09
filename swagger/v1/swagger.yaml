@@ -1,0 +1,142 @@
+---
+openapi: 3.0.1
+info:
+  title: API V1
+  version: v1
+paths:
+  "/tasks":
+    get:
+      summary: Get tasks
+      tags:
+      - Tasks
+      security:
+      - Bearer: {}
+      parameters:
+      - name: order_direction
+        in: query
+        enum:
+        - asc
+        - desc
+      - name: order_by
+        in: query
+        enum:
+        - id
+        - name
+        - description
+      - name: page
+        in: query
+        schema:
+          type: integer
+      - name: per_page
+        in: query
+        schema:
+          type: integer
+      responses:
+        '200':
+          description: get list
+    post:
+      summary: Create a Task
+      tags:
+      - Tasks
+      security:
+      - Bearer: {}
+      parameters: []
+      responses:
+        '201':
+          description: task created
+        '422':
+          description: invalid request
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                description:
+                  type: string
+                status:
+                  enum:
+                  - active
+                  - inactive
+                  - in_progress
+              required:
+              - name
+  "/tasks/{id}":
+    get:
+      summary: Get a task
+      tags:
+      - Tasks
+      security:
+      - Bearer: {}
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: task retreived
+    put:
+      summary: Update a task
+      tags:
+      - Tasks
+      security:
+      - Bearer: {}
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: task created
+        '422':
+          description: invalid request
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                description:
+                  type: string
+                status:
+                  enum:
+                  - active
+                  - inactive
+                  - in_progress
+              required:
+              - name
+    delete:
+      summary: Delete a task
+      tags:
+      - Tasks
+      security:
+      - Bearer: {}
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        '204':
+          description: task deleted succesfully
+components:
+  securitySchemes:
+    Bearer:
+      description: the jwt for API auth
+      type: apiKey
+      name: Authorization
+      in: header
+servers:
+- url: http://{defaultHost}
+  variables:
+    defaultHost:
+      default: 127.0.0.1:3000

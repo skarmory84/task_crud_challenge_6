@@ -4,7 +4,9 @@ class ApplicationController < ActionController::API
 
   rescue_from CanCan::AccessDenied do |exception|
     respond_to do |format|
-      format.json { head :forbidden }
+      format.json {
+        render json: { error: 404, message: 'You are not authorized' }, status: :forbidden 
+      }
     end
   end
 end
